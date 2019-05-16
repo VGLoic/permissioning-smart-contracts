@@ -33,14 +33,16 @@ class WhitelistTableContainer extends Component {
             remove: false,
             lock: false
         },
-        toasts: {
-            add: "",
-            remove: "",
-            lock: ""
-        },
+        toasts: [],
         input: { value: "", validated: false },
-        transactions: new Map()
+        transactions: new Map(),
+        timeouts: []
     };
+
+    componentWillUnmount() {
+        const { timeouts } = this.state;
+        timeouts.forEach(timeoutId => clearTimeout(timeoutId));
+    }
 
     componentDidUpdate(prevProps, prevState) {
         const { whitelist: prevWhitelist } = prevProps;
@@ -147,8 +149,7 @@ class WhitelistTableContainer extends Component {
                     Rules: {
                         methods: { addEnode }
                     }
-                },
-                web3: { eth }
+                }
             }
         } = this.props;
         const { enodeHigh, enodeLow, ip, port } = enodeToParams(value);
@@ -158,9 +159,17 @@ class WhitelistTableContainer extends Component {
             ip,
             port
         });
-        const nonce = await eth.getTransactionCount(userAddress, "pending");
+        const gasLimit = await addEnode(
+            enodeHigh,
+            enodeLow,
+            ip,
+            port
+        ).estimateGas({ from: userAddress });
         addEnode(enodeHigh, enodeLow, ip, port)
-            .send({ nonce, from: userAddress })
+            .send({
+                gasLimit: gasLimit * 4,
+                from: userAddress
+            })
             .on("transactionHash", () =>
                 this.setState(({ modals, transactions }) => ({
                     modals: {
@@ -175,15 +184,28 @@ class WhitelistTableContainer extends Component {
                     )
                 }))
             )
-            .on("error", () =>
+            .on("receipt", () => {
+                this.openToast(
+                    identifier,
+                    "success",
+                    `New whitelisted node processed: ${enodeHigh}${enodeLow}`
+                );
+            })
+            .on("error", () => {
                 this.setState(({ transactions }) => ({
                     transactions: updateKeyInMap(
                         transactions,
                         identifier,
                         "failAddition"
                     )
-                }))
-            );
+                }));
+                this.openToast(
+                    identifier,
+                    "fail",
+                    "Could not add node to whitelist",
+                    `${enodeHigh}${enodeLow} was unable to be added. Please try again`
+                );
+            });
     };
 
     handleRemove = async () => {
@@ -195,21 +217,26 @@ class WhitelistTableContainer extends Component {
                     Rules: {
                         methods: { removeEnode }
                     }
-                },
-                web3: { eth }
+                }
             }
         } = this.props;
-        const nonce = await eth.getTransactionCount(userAddress, "pending");
-        selectedRows.forEach((identifier, index) => {
+        selectedRows.forEach(async (identifier, index) => {
             const { enodeHigh, enodeLow, ip, port } = identifierToParams(
                 identifier
             );
+            const gasLimit = await removeEnode(
+                enodeHigh,
+                enodeLow,
+                ip,
+                port
+            ).estimateGas({ from: userAddress });
+            console.log("Gas Limit: ", gasLimit);
             removeEnode(enodeHigh, enodeLow, ip, port)
                 .send({
-                    nonce: Number(nonce) + Number(index),
-                    from: userAddress
+                    from: userAddress,
+                    gasLimit: gasLimit * 4
                 })
-                .on("transactionHash", () =>
+                .on("transactionHash", () => {
                     this.setState(({ transactions, selectedRows, modals }) => ({
                         modals: {
                             ...modals,
@@ -221,9 +248,17 @@ class WhitelistTableContainer extends Component {
                             identifier,
                             "pendingRemoval"
                         )
-                    }))
-                )
-                .on("error", err =>
+                    }));
+                })
+                .on("receipt", () => {
+                    this.openToast(
+                        identifier,
+                        "success",
+                        `Removal of whitelisted node processed: ${enodeHigh}${enodeLow}`
+                    );
+                })
+                .on("error", err => {
+                    console.log("Error: ", err);
                     this.setState(({ transactions }) => ({
                         modalRemoveOpen: false,
                         transactions: updateKeyInMap(
@@ -231,8 +266,14 @@ class WhitelistTableContainer extends Component {
                             identifier,
                             "failRemoval"
                         )
-                    }))
-                );
+                    }));
+                    this.openToast(
+                        identifier,
+                        "fail",
+                        "Could not remove node to whitelist",
+                        `${enodeHigh}${enodeLow} was unable to be removed. Please try again`
+                    );
+                });
         });
     };
 
@@ -245,18 +286,14 @@ class WhitelistTableContainer extends Component {
                     Rules: {
                         methods: { enterReadOnly, exitReadOnly }
                     }
-                },
-                web3
+                }
             }
         } = this.props;
         const method = isReadOnly ? exitReadOnly : enterReadOnly;
-        const nonce = await web3.eth.getTransactionCount(
-            userAddress,
-            "pending"
-        );
+        const gasLimit = await method().estimateGas({ from: userAddress });
         method()
-            .send({ nonce, from: userAddress })
-            .on("transactionHash", () =>
+            .send({ from: userAddress, gasLimit: gasLimit * 4 })
+            .on("transactionHash", () => {
                 this.setState(({ transactions, modals }) => ({
                     modals: {
                         ...modals,
@@ -267,39 +304,77 @@ class WhitelistTableContainer extends Component {
                         "lock",
                         "pendingLock"
                     )
-                }))
-            )
+                }));
+                this.openToast(
+                    "lock",
+                    "pending",
+                    isReadOnly
+                        ? "Please wait while we unlock the values."
+                        : "Please wait while we lock the whitelisted nodes. Once completed no changes can be made until you unlock the values."
+                );
+            })
             .on("receipt", () => {
                 this.setState(({ transactions }) => ({
                     transactions: deleteKeyInMap(transactions, "lock")
                 }));
-                this.openToast("Lock", "success");
+                this.updateToast(
+                    "lock",
+                    "success",
+                    "Changes have been locked!"
+                );
             })
             .on("error", () => {
                 this.setState(({ transactions }) => ({
                     transactions: deleteKeyInMap(transactions, "lock")
                 }));
-                this.openToast("Lock", "fail");
+                this.updateToast(
+                    "lock",
+                    "fail",
+                    isReadOnly
+                        ? "Could not unlock values."
+                        : "Could not lock changes.",
+                    "The transaction was unabled to be processed. Please try again."
+                );
             });
     };
 
-    openToast = (topic, status) => {
-        this.setState(({ toasts }) => ({
-            toasts: {
-                ...toasts,
-                [topic]: status
-            }
-        }));
-        setTimeout(this.closeToast(topic), 4000);
+    openToast = (id, status, message, secondaryMessage) => {
+        const timeoutId = setTimeout(this.closeToast(id), 15000);
+        this.setState(({ toasts, timeouts }) => {
+            const updatedToasts = [...toasts];
+            updatedToasts.push({ status, message, secondaryMessage, id });
+            return {
+                toasts: updatedToasts,
+                timeouts: [...timeouts, timeoutId]
+            };
+        });
     };
 
-    closeToast = topic =>
-        this.setState(({ toasts }) => ({
-            toasts: {
-                ...toasts,
-                [topic]: ""
-            }
-        }));
+    updateToast = (targetedId, status, message, secondaryMessage) => {
+        this.setState(({ toasts }) => {
+            const updatedToasts = [...toasts];
+            const index = updatedToasts.findIndex(
+                ({ id }) => id === targetedId
+            );
+            updatedToasts[index] = {
+                status,
+                message,
+                secondaryMessage,
+                id: targetedId
+            };
+            return { toasts: updatedToasts };
+        });
+    };
+
+    closeToast = targetedId => () =>
+        this.setState(({ toasts }) => {
+            const updatedToasts = [...toasts];
+            const index = updatedToasts.findIndex(
+                ({ id }) => id === targetedId
+            );
+            updatedToasts.splice(index, 1);
+            return { toasts: updatedToasts };
+        });
 
     render() {
         const { isAdmin, isReadOnly } = this.props;
@@ -316,6 +391,7 @@ class WhitelistTableContainer extends Component {
                 handleAddNode={this.handleAddNode}
                 handleRemove={this.handleRemove}
                 handleLock={this.handleLock}
+                closeToast={this.closeToast}
             />
         );
     }

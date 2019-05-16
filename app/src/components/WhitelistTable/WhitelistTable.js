@@ -2,7 +2,7 @@
 import React, { Fragment } from "react";
 import PropTypes from "prop-types";
 // Rimble Components
-import { Box, Table } from "rimble-ui";
+import { Flex, Box, Table } from "rimble-ui";
 // Components
 import TableHeader from "./TableHeader";
 import LockModal from "./LockModal";
@@ -10,6 +10,9 @@ import AddWhitelistModal from "./AddWhitelistModal";
 import RemoveModal from "./RemoveModal";
 import EmptyRow from "./EmptyRow";
 import WhitelistRow from "./WhitelistRow";
+import PendingToast from "../Toasts/PendingToast";
+import ErrorToast from "../Toasts/ErrorToast";
+import SuccessToast from "../Toasts/SuccessToast";
 // Styles
 import styles from "./styles.module.scss";
 
@@ -27,9 +30,38 @@ const WhitelistTable = ({
     toggleModal,
     handleAddNode,
     handleRemove,
-    handleLock
+    handleLock,
+    closeToast
 }) => (
     <Fragment>
+        <Flex
+            position="absolute"
+            bottom="50px"
+            right="50px"
+            flexDirection="column"
+        >
+            {toasts.map(({ status, id, ...messages }, index) => (
+                <Fragment key={index}>
+                    {status === "pending" && (
+                        <PendingToast
+                            {...messages}
+                            closeToast={closeToast(id)}
+                        />
+                    )}
+                    {status === "fail" && (
+                        <ErrorToast {...messages} closeToast={closeToast(id)} />
+                    )}
+                    {status === "success" && (
+                        <SuccessToast
+                            position="absolute"
+                            bottom="0"
+                            {...messages}
+                            closeToast={closeToast(id)}
+                        />
+                    )}
+                </Fragment>
+            ))}
+        </Flex>
         <Box mt={5}>
             <TableHeader
                 number={whitelist.length}
@@ -97,7 +129,7 @@ WhitelistTable.propTypes = {
     whitelist: PropTypes.arrayOf(PropTypes.object).isRequired,
     selectedRows: PropTypes.arrayOf(PropTypes.string).isRequired,
     modals: PropTypes.object.isRequired,
-    toasts: PropTypes.object.isRequired,
+    toasts: PropTypes.arrayOf(PropTypes.object).isRequired,
     input: PropTypes.object.isRequired,
     isAdmin: PropTypes.bool.isRequired,
     isReadOnly: PropTypes.bool.isRequired,
@@ -107,7 +139,8 @@ WhitelistTable.propTypes = {
     toggleModal: PropTypes.func.isRequired,
     handleAddNode: PropTypes.func.isRequired,
     handleRemove: PropTypes.func.isRequired,
-    handleLock: PropTypes.func.isRequired
+    handleLock: PropTypes.func.isRequired,
+    closeToast: PropTypes.func.isRequired
 };
 
 export default WhitelistTable;

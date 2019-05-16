@@ -68,6 +68,7 @@ class DataOrchestrator extends Component {
             ],
             userAddress
         } = this.props;
+        // console.log('Size: ', _.value)
         const { whitelist } = this.state;
         return {
             isReadOnly,

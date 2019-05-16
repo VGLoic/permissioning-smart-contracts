@@ -23,8 +23,15 @@ class AdminTableContainer extends Component {
         modalAddOpen: false,
         modalRemoveOpen: false,
         input: { value: "", validated: false },
-        transactions: new Map()
+        transactions: new Map(),
+        toasts: [],
+        timeouts: []
     };
+
+    componentWillUnmount() {
+        const { timeouts } = this.state;
+        timeouts.forEach(timeoutId => clearTimeout(timeoutId));
+    }
 
     componentDidUpdate(prevProps, prevState) {
         const { adminList: prevAdminList } = prevProps;
@@ -122,13 +129,14 @@ class AdminTableContainer extends Component {
                     Admin: {
                         methods: { addAdmin }
                     }
-                },
-                web3: { eth }
+                }
             }
         } = this.props;
-        const nonce = await eth.getTransactionCount(userAddress, "pending");
+        const gasLimit = await addAdmin(value).estimateGas({
+            from: userAddress
+        });
         addAdmin(value)
-            .send({ nonce, from: userAddress })
+            .send({ from: userAddress, gasLimit: gasLimit * 4 })
             .on("transactionHash", () =>
                 this.setState(({ transactions }) => ({
                     modalAddOpen: false,
@@ -140,7 +148,14 @@ class AdminTableContainer extends Component {
                     )
                 }))
             )
-            .on("error", () =>
+            .on("receipt", () => {
+                this.openToast(
+                    value,
+                    "success",
+                    `New admin account processed: ${value}`
+                );
+            })
+            .on("error", () => {
                 this.setState(({ transactions }) => ({
                     modalAddOpen: false,
                     input: { value: "", validated: false },
@@ -149,8 +164,14 @@ class AdminTableContainer extends Component {
                         value,
                         "failAddition"
                     )
-                }))
-            );
+                }));
+                this.openToast(
+                    value,
+                    "fail",
+                    "Could not add account as admin",
+                    `${value} was unable to be added. Please try again.`
+                );
+            });
     };
 
     handleRemove = async () => {
@@ -162,15 +183,16 @@ class AdminTableContainer extends Component {
                     Admin: {
                         methods: { removeAdmin }
                     }
-                },
-                web3: { eth }
+                }
             }
         } = this.props;
-        const nonce = await eth.getTransactionCount(userAddress, "pending");
-        selectedRows.forEach((address, index) =>
+        selectedRows.forEach(async (address, index) => {
+            const gasLimit = await removeAdmin(address).estimateGas({
+                from: userAddress
+            });
             removeAdmin(address)
                 .send({
-                    nonce: Number(nonce) + Number(index),
+                    gasLimit: gasLimit * 4,
                     from: userAddress
                 })
                 .on("transactionHash", () =>
@@ -184,7 +206,14 @@ class AdminTableContainer extends Component {
                         )
                     }))
                 )
-                .on("error", err =>
+                .on("receipt", () => {
+                    this.openToast(
+                        address,
+                        "success",
+                        `Removal of admin account processed: ${address}`
+                    );
+                })
+                .on("error", err => {
                     this.setState(({ transactions }) => ({
                         modalRemoveOpen: false,
                         transactions: updateKeyInMap(
@@ -192,10 +221,38 @@ class AdminTableContainer extends Component {
                             address,
                             "failRemoval"
                         )
-                    }))
-                )
-        );
+                    }));
+                    this.openToast(
+                        address,
+                        "fail",
+                        "Could not remove admin account",
+                        `${address} was unable to be removed. Please try again.`
+                    );
+                });
+        });
     };
+
+    openToast = (id, status, message, secondaryMessage) => {
+        const timeoutId = setTimeout(this.closeToast(id), 15000);
+        this.setState(({ toasts, timeouts }) => {
+            const updatedToasts = [...toasts];
+            updatedToasts.push({ status, message, secondaryMessage, id });
+            return {
+                toasts: updatedToasts,
+                timeouts: [...timeouts, timeoutId]
+            };
+        });
+    };
+
+    closeToast = targetedId => () =>
+        this.setState(({ toasts }) => {
+            const updatedToasts = [...toasts];
+            const index = updatedToasts.findIndex(
+                ({ id }) => id === targetedId
+            );
+            updatedToasts.splice(index, 1);
+            return { toasts: updatedToasts };
+        });
 
     render() {
         const {
@@ -203,12 +260,14 @@ class AdminTableContainer extends Component {
             modalAddOpen,
             modalRemoveOpen,
             input,
-            adminList
+            adminList,
+            toasts
         } = this.state;
         const { userAddress, isAdmin } = this.props;
         return (
             <AdminTable
                 adminList={adminList}
+                toasts={toasts}
                 selectedRows={selectedRows}
                 toggleRow={this.toggleRow}
                 userAddress={userAddress}
@@ -221,6 +280,7 @@ class AdminTableContainer extends Component {
                 handleAddAmin={this.handleAddAmin}
                 handleRemove={this.handleRemove}
                 isAdmin={isAdmin}
+                closeToast={this.closeToast}
             />
         );
     }

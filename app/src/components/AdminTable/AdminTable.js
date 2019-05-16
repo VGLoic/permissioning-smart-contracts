@@ -2,18 +2,22 @@
 import React, { Fragment } from "react";
 import PropTypes from "prop-types";
 // Rimble Components
-import { Box, Table } from "rimble-ui";
+import { Flex, Box, Table } from "rimble-ui";
 // Components
 import TableHeader from "./TableHeader";
 import EmptyRow from "./EmptyRow";
 import AdminRow from "./AdminRow";
 import AddAdminModal from "./AddAdminModal";
 import RemoveAdminModal from "./RemoveAdminModal";
+import PendingToast from "../Toasts/PendingToast";
+import ErrorToast from "../Toasts/ErrorToast";
+import SuccessToast from "../Toasts/SuccessToast";
 // Styles
 import styles from "./styles.module.scss";
 
 const AdminTable = ({
     adminList,
+    toasts,
     toggleRow,
     selectedRows,
     userAddress,
@@ -25,9 +29,38 @@ const AdminTable = ({
     modifyAddress,
     handleAddAmin,
     handleRemove,
-    isAdmin
+    isAdmin,
+    closeToast
 }) => (
     <Fragment>
+        <Flex
+            position="absolute"
+            bottom="50px"
+            right="50px"
+            flexDirection="column"
+        >
+            {toasts.map(({ status, id, ...messages }, index) => (
+                <Fragment key={index}>
+                    {status === "pending" && (
+                        <PendingToast
+                            {...messages}
+                            closeToast={closeToast(id)}
+                        />
+                    )}
+                    {status === "fail" && (
+                        <ErrorToast {...messages} closeToast={closeToast(id)} />
+                    )}
+                    {status === "success" && (
+                        <SuccessToast
+                            position="absolute"
+                            bottom="0"
+                            {...messages}
+                            closeToast={closeToast(id)}
+                        />
+                    )}
+                </Fragment>
+            ))}
+        </Flex>
         <Box mt={5}>
             <TableHeader
                 number={adminList.length}
@@ -77,6 +110,7 @@ const AdminTable = ({
 
 AdminTable.propTypes = {
     adminList: PropTypes.arrayOf(PropTypes.object).isRequired,
+    toasts: PropTypes.arrayOf(PropTypes.object).isRequired,
     toggleRow: PropTypes.func.isRequired,
     selectedRows: PropTypes.arrayOf(PropTypes.string).isRequired,
     userAddress: PropTypes.string.isRequired,
@@ -88,7 +122,8 @@ AdminTable.propTypes = {
     modifyAddress: PropTypes.func.isRequired,
     handleAddAmin: PropTypes.func.isRequired,
     handleRemove: PropTypes.func.isRequired,
-    isAdmin: PropTypes.bool.isRequired
+    isAdmin: PropTypes.bool.isRequired,
+    closeToast: PropTypes.func.isRequired
 };
 
 export default AdminTable;
