@@ -15,7 +15,9 @@ const WhitelistRow = ({
     status,
     selected,
     toggleRow,
-    isAdmin
+    isAdmin,
+    isReadOnly,
+    pendingLock
 }) => (
     <tr>
         <td colSpan="2">
@@ -25,6 +27,8 @@ const WhitelistRow = ({
                     checked={selected}
                     onChange={() => toggleRow(identifier)}
                     disabled={
+                        isReadOnly ||
+                        pendingLock ||
                         !isAdmin ||
                         status === "pendingRemoval" ||
                         status === "pendingAddition"
@@ -98,7 +102,9 @@ WhitelistRow.propTypes = {
     status: PropTypes.string.isRequired,
     selected: PropTypes.bool.isRequired,
     toggleRow: PropTypes.func.isRequired,
-    isAdmin: PropTypes.bool.isRequired
+    isAdmin: PropTypes.bool.isRequired,
+    isReadOnly: PropTypes.bool.isRequired,
+    pendingLock: PropTypes.bool.isRequired
 };
 
 export default WhitelistRow;

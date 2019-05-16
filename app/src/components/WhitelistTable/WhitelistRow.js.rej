@@ -1,0 +1,8 @@
+diff a/app/src/components/WhitelistTable/WhitelistRow.js b/app/src/components/WhitelistTable/WhitelistRow.js	(rejected hunks)
+@@ -27 +27,5 @@ const WhitelistRow = ({
+-                    disabled={!isAdmin || status === "pendingRemoval" || status === 'pendingAddition'}
++                    disabled={
++                        !isAdmin ||
++                        status === "pendingRemoval" ||
++                        status === "pendingAddition"
++                    }
