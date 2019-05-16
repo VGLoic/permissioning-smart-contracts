@@ -6,7 +6,14 @@ import { Pill, Checkbox, Flex, Text } from "rimble-ui";
 // Styles
 import styles from "./styles.module.scss";
 
-const AdminRow = ({ address, status, selected, toggleRow, isSelf }) => (
+const AdminRow = ({
+    address,
+    status,
+    selected,
+    toggleRow,
+    isSelf,
+    isAdmin
+}) => (
     <tr>
         <td>
             <Flex alignItems="center">
@@ -14,7 +21,12 @@ const AdminRow = ({ address, status, selected, toggleRow, isSelf }) => (
                     color="#25D78F"
                     checked={selected}
                     onChange={() => toggleRow(address)}
-                    disabled={isSelf || status === "pendingRemoval"}
+                    disabled={
+                        isSelf ||
+                        !isAdmin ||
+                        status === "pendingRemoval" ||
+                        status === "pendingAddition"
+                    }
                 />
                 {status === "pendingRemoval" ? (
                     <Text.s fontSize="14px">{address}</Text.s>
@@ -48,7 +60,8 @@ AdminRow.propTypes = {
     status: PropTypes.string.isRequired,
     selected: PropTypes.bool.isRequired,
     toggleRow: PropTypes.func.isRequired,
-    isSelf: PropTypes.bool.isRequired
+    isSelf: PropTypes.bool.isRequired,
+    isAdmin: PropTypes.bool.isRequired
 };
 
 export default AdminRow;

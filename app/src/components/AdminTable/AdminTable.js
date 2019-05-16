@@ -52,6 +52,7 @@ const AdminTable = ({
                             selected={selectedRows.includes(address)}
                             toggleRow={toggleRow}
                             isSelf={userAddress === address}
+                            isAdmin={isAdmin}
                         />
                     ))}
                     {adminList.length === 0 && <EmptyRow />}

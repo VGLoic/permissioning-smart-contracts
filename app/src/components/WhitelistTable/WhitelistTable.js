@@ -61,6 +61,7 @@ const WhitelistTable = ({
                             key={enode.identifier}
                             toggleRow={toggleRow}
                             selected={selectedRows.includes(enode.identifier)}
+                            isAdmin={isAdmin}
                             {...enode}
                         />
                     ))}
