@@ -110,15 +110,25 @@ class AdminTableContainer extends Component {
         this.setState({ input: { value, validated: validated } });
     };
 
-    handleAddAmin = e => {
+    handleAddAmin = async e => {
         e.preventDefault();
         const {
             input: { value }
         } = this.state;
-        const { userAddress } = this.props;
-        const { addAdmin } = this.props.drizzle.contracts.Admin.methods;
+        const {
+            userAddress,
+            drizzle: {
+                contracts: {
+                    Admin: {
+                        methods: { addAdmin }
+                    }
+                },
+                web3: { eth }
+            }
+        } = this.props;
+        const nonce = await eth.getTransactionCount(userAddress, "pending");
         addAdmin(value)
-            .send({ from: userAddress })
+            .send({ nonce, from: userAddress })
             .on("transactionHash", () =>
                 this.setState(({ transactions }) => ({
                     modalAddOpen: false,
@@ -156,7 +166,7 @@ class AdminTableContainer extends Component {
                 web3: { eth }
             }
         } = this.props;
-        const nonce = await eth.getTransactionCount(userAddress);
+        const nonce = await eth.getTransactionCount(userAddress, "pending");
         selectedRows.forEach((address, index) =>
             removeAdmin(address)
                 .send({

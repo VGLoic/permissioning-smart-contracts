@@ -135,13 +135,22 @@ class WhitelistTableContainer extends Component {
         this.setState({ input: { value, validated: validated } });
     };
 
-    handleAddNode = e => {
+    handleAddNode = async e => {
         e.preventDefault();
         const {
             input: { value }
         } = this.state;
-        const { userAddress } = this.props;
-        const { addEnode } = this.props.drizzle.contracts.Rules.methods;
+        const {
+            userAddress,
+            drizzle: {
+                contracts: {
+                    Rules: {
+                        methods: { addEnode }
+                    }
+                },
+                web3: { eth }
+            }
+        } = this.props;
         const { enodeHigh, enodeLow, ip, port } = enodeToParams(value);
         const identifier = paramsToIdentifier({
             enodeHigh,
@@ -149,8 +158,9 @@ class WhitelistTableContainer extends Component {
             ip,
             port
         });
+        const nonce = await eth.getTransactionCount(userAddress, "pending");
         addEnode(enodeHigh, enodeLow, ip, port)
-            .send({ from: userAddress })
+            .send({ nonce, from: userAddress })
             .on("transactionHash", () =>
                 this.setState(({ modals, transactions }) => ({
                     modals: {
@@ -189,7 +199,7 @@ class WhitelistTableContainer extends Component {
                 web3: { eth }
             }
         } = this.props;
-        const nonce = await eth.getTransactionCount(userAddress);
+        const nonce = await eth.getTransactionCount(userAddress, "pending");
         selectedRows.forEach((identifier, index) => {
             const { enodeHigh, enodeLow, ip, port } = identifierToParams(
                 identifier
@@ -240,7 +250,10 @@ class WhitelistTableContainer extends Component {
             }
         } = this.props;
         const method = isReadOnly ? exitReadOnly : enterReadOnly;
-        const nonce = await web3.eth.getTransactionCount(userAddress);
+        const nonce = await web3.eth.getTransactionCount(
+            userAddress,
+            "pending"
+        );
         method()
             .send({ nonce, from: userAddress })
             .on("transactionHash", () =>

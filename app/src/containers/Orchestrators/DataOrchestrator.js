@@ -94,22 +94,13 @@ class DataOrchestrator extends Component {
                 <LoadingPage />
             );
         return <Layout>{child}</Layout>;
-        // if (dataInitialized) {
-        //     const contextValue = this.deriveContextValue();
-        //     return (
-        //         <DataContext.Provider value={contextValue}>
-        //             <Layout />
-        //         </DataContext.Provider>
-        //     );
-        // }
-        // return <LoadingPage />;
     }
 }
 
 DataOrchestrator.propTypes = {
     drizzle: PropTypes.object.isRequired,
     values: PropTypes.arrayOf(PropTypes.object).isRequired,
-    userAddress: PropTypes.string.isRequired,
+    userAddress: PropTypes.string,
     isCorrectNetwork: PropTypes.bool,
     networkId: PropTypes.number
 };
