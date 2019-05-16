@@ -1,0 +1,84 @@
+table thead tr th.headerCell {
+  text-transform: capitalize;
+}
+
+tr td.emptyLine {
+  text-align: center;
+  color: #8F8F8F;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.pill {
+  border-radius: 12px;
+  width: auto;
+  height: auto;
+  cursor: default;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.validField {
+  div input {
+    border-style: solid;
+    border-color: #28C081;
+
+    &:focus {
+      border-style: solid;
+      border-color: #28C081;
+    }
+  }
+
+  div svg {
+    &:nth-of-type(1) {
+      visibility: visible;
+    }
+  }
+}
+
+.closeIcon {
+  position: absolute;
+}
+
+.removeBtn {
+  transition: all .3s ease-in-out;
+
+  &.disabled {
+    border-color: #000e1a;
+    color: #000e1a;
+  }
+
+  &.active {
+    border-color: #cc3300;
+    color: #cc3300;
+
+    &:hover {
+      border-color: #cc3300;
+      color: #cc3300;
+    }
+  }
+}
+
+
+.invalidField {
+  div input {
+    border-style: solid;
+    border-color: #EC9081;
+
+    &:focus {
+      border-style: solid;
+      border-color: #EC9081;
+    }
+  }
+  div svg {
+    &:last-child {
+        visibility: visible;
+    }
+  }
+}
+
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
