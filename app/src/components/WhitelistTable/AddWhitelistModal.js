@@ -54,8 +54,14 @@ const AddWhitelistModal = ({
                             value={input.value}
                             onChange={modifyInput}
                             required
+                            className={styles.fieldInput}
                         />
                     </Form.Field>
+                    <Text color="red" height="30px" fontSize="14px">
+                        {input.value &&
+                            input.validated === false &&
+                            "Enode URL must include Address, IP Address and Port."}
+                    </Text>
                 </Box>
                 <Flex
                     px={4}

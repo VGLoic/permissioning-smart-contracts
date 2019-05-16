@@ -18,6 +18,12 @@ tr td.emptyLine {
   font-size: 13px;
 }
 
+.fieldInput {
+  &:focus {
+    border-color: #CCC;
+  }
+}
+
 .validField {
   div input {
     border-style: solid;

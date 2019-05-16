@@ -50,9 +50,15 @@ const AddAminModal = ({
                             placeholder="Ex: 0xAc03BB73b6a9e108530AFf4Df5077c2B3D481e5A"
                             value={input.value}
                             onChange={modifyAddress}
+                            className={styles.fieldInput}
                             required
                         />
                     </Form.Field>
+                    <Text color="red" height="30px" fontSize="14px">
+                        {input.value &&
+                            input.validated === false &&
+                            "Account address is not correct"}
+                    </Text>
                 </Box>
                 <Flex
                     px={4}
