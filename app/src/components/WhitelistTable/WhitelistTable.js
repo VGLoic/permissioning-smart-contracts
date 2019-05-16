@@ -31,7 +31,8 @@ const WhitelistTable = ({
     handleAddNode,
     handleRemove,
     handleLock,
-    closeToast
+    closeToast,
+    deleteTransaction
 }) => (
     <Fragment>
         <Flex
@@ -96,6 +97,7 @@ const WhitelistTable = ({
                             isAdmin={isAdmin}
                             isReadOnly={isReadOnly}
                             pendingLock={pendingLock}
+                            deleteTransaction={deleteTransaction}
                             {...enode}
                         />
                     ))}
@@ -140,7 +142,8 @@ WhitelistTable.propTypes = {
     handleAddNode: PropTypes.func.isRequired,
     handleRemove: PropTypes.func.isRequired,
     handleLock: PropTypes.func.isRequired,
-    closeToast: PropTypes.func.isRequired
+    closeToast: PropTypes.func.isRequired,
+    deleteTransaction: PropTypes.func.isRequired
 };
 
 export default WhitelistTable;

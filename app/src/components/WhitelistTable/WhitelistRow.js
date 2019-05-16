@@ -1,5 +1,5 @@
 // Libs
-import React from "react";
+import React, { Fragment } from "react";
 import PropTypes from "prop-types";
 // Rimble Components
 import { Pill, Checkbox, Flex, Text } from "rimble-ui";
@@ -17,7 +17,8 @@ const WhitelistRow = ({
     toggleRow,
     isAdmin,
     isReadOnly,
-    pendingLock
+    pendingLock,
+    deleteTransaction
 }) => (
     <tr>
         <td colSpan="2">
@@ -31,7 +32,9 @@ const WhitelistRow = ({
                         pendingLock ||
                         !isAdmin ||
                         status === "pendingRemoval" ||
-                        status === "pendingAddition"
+                        status === "pendingAddition" ||
+                        status === "failAddition" ||
+                        status === "failRemoval"
                     }
                 />
                 {status === "pendingRemoval" ? (
@@ -89,6 +92,36 @@ const WhitelistRow = ({
                     Pending Removal
                 </Pill>
             )}
+            {status === "failAddition" && (
+                <Fragment>
+                    <Pill color="#FF1C1E" className={styles.pill}>
+                        Addition Failed
+                    </Pill>
+                    <Pill
+                        color="green"
+                        ml={2}
+                        className={styles.pill}
+                        onClick={() => deleteTransaction(identifier)}
+                    >
+                        Clear
+                    </Pill>
+                </Fragment>
+            )}
+            {status === "failRemoval" && (
+                <Fragment>
+                    <Pill color="#FF1C1E" className={styles.pill}>
+                        Removal Failed
+                    </Pill>
+                    <Pill
+                        color="green"
+                        ml={2}
+                        className={styles.pill}
+                        onClick={() => deleteTransaction(identifier)}
+                    >
+                        Clear
+                    </Pill>
+                </Fragment>
+            )}
         </td>
     </tr>
 );
@@ -104,7 +137,8 @@ WhitelistRow.propTypes = {
     toggleRow: PropTypes.func.isRequired,
     isAdmin: PropTypes.bool.isRequired,
     isReadOnly: PropTypes.bool.isRequired,
-    pendingLock: PropTypes.bool.isRequired
+    pendingLock: PropTypes.bool.isRequired,
+    deleteTransaction: PropTypes.func.isRequired
 };
 
 export default WhitelistRow;

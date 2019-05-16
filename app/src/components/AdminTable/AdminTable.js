@@ -30,7 +30,8 @@ const AdminTable = ({
     handleAddAmin,
     handleRemove,
     isAdmin,
-    closeToast
+    closeToast,
+    deleteTransaction
 }) => (
     <Fragment>
         <Flex
@@ -86,6 +87,7 @@ const AdminTable = ({
                             toggleRow={toggleRow}
                             isSelf={userAddress === address}
                             isAdmin={isAdmin}
+                            deleteTransaction={deleteTransaction}
                         />
                     ))}
                     {adminList.length === 0 && <EmptyRow />}
@@ -123,7 +125,8 @@ AdminTable.propTypes = {
     handleAddAmin: PropTypes.func.isRequired,
     handleRemove: PropTypes.func.isRequired,
     isAdmin: PropTypes.bool.isRequired,
-    closeToast: PropTypes.func.isRequired
+    closeToast: PropTypes.func.isRequired,
+    deleteTransaction: PropTypes.func.isRequired
 };
 
 export default AdminTable;

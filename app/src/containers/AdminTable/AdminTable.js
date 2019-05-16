@@ -92,6 +92,12 @@ class AdminTableContainer extends Component {
         });
     };
 
+    deleteTransaction = key => {
+        const updatedTransactions = new Map([...this.state.transactions]);
+        updatedTransactions.delete(key);
+        this.setState({ transactions: updatedTransactions });
+    };
+
     toggleRow = address => {
         const { selectedRows } = this.state;
         const index = selectedRows.findIndex(
@@ -281,6 +287,7 @@ class AdminTableContainer extends Component {
                 handleRemove={this.handleRemove}
                 isAdmin={isAdmin}
                 closeToast={this.closeToast}
+                deleteTransaction={this.deleteTransaction}
             />
         );
     }

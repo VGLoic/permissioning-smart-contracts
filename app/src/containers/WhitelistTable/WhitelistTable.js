@@ -192,12 +192,16 @@ class WhitelistTableContainer extends Component {
                 );
             })
             .on("error", () => {
-                this.setState(({ transactions }) => ({
+                this.setState(({ transactions, modals }) => ({
                     transactions: updateKeyInMap(
                         transactions,
                         identifier,
                         "failAddition"
-                    )
+                    ),
+                    modals: {
+                        ...modals,
+                        add: false
+                    }
                 }));
                 this.openToast(
                     identifier,
@@ -259,13 +263,17 @@ class WhitelistTableContainer extends Component {
                 })
                 .on("error", err => {
                     console.log("Error: ", err);
-                    this.setState(({ transactions }) => ({
+                    this.setState(({ transactions, modals }) => ({
                         modalRemoveOpen: false,
                         transactions: updateKeyInMap(
                             transactions,
                             identifier,
                             "failRemoval"
-                        )
+                        ),
+                        modals: {
+                            ...modals,
+                            remove: false
+                        }
                     }));
                     this.openToast(
                         identifier,
@@ -338,6 +346,12 @@ class WhitelistTableContainer extends Component {
             });
     };
 
+    deleteTransaction = key => {
+        const updatedTransactions = new Map([...this.state.transactions]);
+        updatedTransactions.delete(key);
+        this.setState({ transactions: updatedTransactions });
+    };
+
     openToast = (id, status, message, secondaryMessage) => {
         const timeoutId = setTimeout(this.closeToast(id), 15000);
         this.setState(({ toasts, timeouts }) => {
@@ -392,6 +406,7 @@ class WhitelistTableContainer extends Component {
                 handleRemove={this.handleRemove}
                 handleLock={this.handleLock}
                 closeToast={this.closeToast}
+                deleteTransaction={this.deleteTransaction}
             />
         );
     }
