@@ -1,23 +1,34 @@
 // Libs
 import React from "react";
-import { Drizzle, generateStore } from "drizzle";
-import { DrizzleContext } from "drizzle-react";
 import { ThemeProvider } from "styled-components";
 // Components
-import DrizzleOrchestrator from "./containers/Orchestrators/DrizzleOrchestrator";
+import Layout from "./components/Layout/Layout";
+import Initializer from "./containers/Layout/Initializer";
+import Dashboard from "./containers/Dashboard/Dashboard";
+import NoProviderFlash from "./components/Flash/NoProviderFlash";
+import WrongNetworkFlash from "./components/Flash/WrongNetworkFlash";
+
 // Theme
 import theme from "./constants/theme";
-// Drizzle configuration
-import drizzleOptions from "./drizzleOptions";
-const drizzleStore = generateStore(drizzleOptions);
-const drizzle = new Drizzle(drizzleOptions, drizzleStore);
+// Context
+import { NetworkProvider } from "./context/network";
+import { DataProvider } from "./context/data";
 
 const App = () => (
-    <DrizzleContext.Provider drizzle={drizzle}>
-        <ThemeProvider theme={theme}>
-            <DrizzleOrchestrator />
-        </ThemeProvider>
-    </DrizzleContext.Provider>
+    <ThemeProvider theme={theme}>
+        <NetworkProvider>
+            <Layout>
+                <Initializer
+                    NoProvider={NoProviderFlash}
+                    WrongNetwork={WrongNetworkFlash}
+                >
+                    <DataProvider>
+                        <Dashboard />
+                    </DataProvider>
+                </Initializer>
+            </Layout>
+        </NetworkProvider>
+    </ThemeProvider>
 );
 
 export default App;

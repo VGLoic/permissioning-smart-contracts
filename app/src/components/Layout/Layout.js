@@ -1,5 +1,5 @@
 // Libs
-import React, { memo } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 // Rimble Components
 import { Flex, Box } from "rimble-ui";
@@ -26,4 +26,4 @@ Layout.propTypes = {
     children: PropTypes.object.isRequired
 };
 
-export default memo(Layout);
+export default Layout;

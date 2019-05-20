@@ -3,20 +3,29 @@ import React, { Fragment } from "react";
 import PropTypes from "prop-types";
 // Components
 import Choices from "./Choices";
-import AdminTable from "../../containers/AdminTable/AdminTable";
-import WhitelistTable from "../../containers/WhitelistTable/WhitelistTable";
+import LoadingPage from "../../components/LoadingPage/LoadingPage";
+// Constants
+import { ADMIN_TAB, ENODE_TAB } from "../../constants/tabs";
+// import AdminTable from "../../containers/AdminTable/AdminTable";
+// import WhitelistTable from "../../containers/WhitelistTable/WhitelistTable";
 
-const Dashboard = ({ goToTab, adminTab }) => (
+const Dashboard = ({ tab, setTab, dataReady }) => (
     <Fragment>
-        <Choices goToTab={goToTab} adminTab={adminTab} />
-        {adminTab && <AdminTable />}
-        {!adminTab && <WhitelistTable />}
+        <Choices setTab={setTab} tab={tab} />
+        {!dataReady ? (
+            <LoadingPage />
+        ) : tab === ADMIN_TAB ? (
+            "ADMIN"
+        ) : tab === ENODE_TAB ? (
+            "ENODE"
+        ) : null}
     </Fragment>
 );
 
 Dashboard.propTypes = {
-    goToTab: PropTypes.func.isRequired,
-    adminTab: PropTypes.bool.isRequired
+    setTab: PropTypes.func.isRequired,
+    tab: PropTypes.string.isRequired,
+    dataReady: PropTypes.bool.isRequired
 };
 
 export default Dashboard;
