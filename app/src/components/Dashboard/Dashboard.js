@@ -6,7 +6,7 @@ import Choices from "./Choices";
 import LoadingPage from "../../components/LoadingPage/LoadingPage";
 // Constants
 import { ADMIN_TAB, ENODE_TAB } from "../../constants/tabs";
-// import AdminTable from "../../containers/AdminTable/AdminTable";
+import AdminTab from "../../containers/Tabs/Admin";
 // import WhitelistTable from "../../containers/WhitelistTable/WhitelistTable";
 
 const Dashboard = ({ tab, setTab, dataReady }) => (
@@ -15,7 +15,7 @@ const Dashboard = ({ tab, setTab, dataReady }) => (
         {!dataReady ? (
             <LoadingPage />
         ) : tab === ADMIN_TAB ? (
-            "ADMIN"
+            <AdminTab />
         ) : tab === ENODE_TAB ? (
             "ENODE"
         ) : null}

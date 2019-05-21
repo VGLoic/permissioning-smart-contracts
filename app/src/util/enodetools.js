@@ -55,23 +55,6 @@ export const enodeToParams = enodeURL => {
         ip: ip ? getHexIpv4(ip) : null,
         port
     };
-
-    // const splitUrl = enodeURL.split("//")[1].split("@");
-    // const enodeId = splitUrl[0];
-    // console.log(enodeId.length)
-    // const enodeHigh = "0x" + enodeId.slice(0, 64);
-    // const enodeLow = "0x" + enodeId.slice(64);
-    // const ip = splitUrl[1].split(":")[0];
-    // const port = splitUrl[1].split(":")[1].split("?")[0];
-    //
-    // const params = {
-    //     enodeHigh,
-    //     enodeLow,
-    //     ip: getHexIpv4(ip),
-    //     port
-    // };
-    //
-    // return params;
 };
 
 export const isValidEnode = str => {

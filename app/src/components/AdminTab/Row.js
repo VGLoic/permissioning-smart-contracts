@@ -1,61 +1,49 @@
 // Libs
-import React, { Fragment } from "react";
+import React from "react";
 import PropTypes from "prop-types";
 // Rimble Components
-import { Pill, Checkbox, Flex, Text } from "rimble-ui";
+import { Pill, Flex, Box, Text, Button } from "rimble-ui";
 // Styles
 import styles from "./styles.module.scss";
 
 const AdminRow = ({
     address,
     status,
-    selected,
-    toggleRow,
     isSelf,
     isAdmin,
-    deleteTransaction
+    deleteTransaction,
+    openRemoveModal
 }) => (
-    <tr>
+    <tr className={styles.row}>
         <td>
             <Flex alignItems="center">
-                <Checkbox
-                    color="#25D78F"
-                    checked={selected}
-                    onChange={() => toggleRow(address)}
-                    disabled={
-                        isSelf ||
-                        !isAdmin ||
-                        status === "pendingRemoval" ||
-                        status === "pendingAddition" ||
-                        status === "failAddition" ||
-                        status === "failRemoval"
-                    }
-                />
                 {status === "pendingRemoval" ? (
-                    <Text.s fontSize="14px">{address}</Text.s>
+                    <Text.s opacity="0.5" fontSize="14px">{address}</Text.s>
                 ) : (
                     <Text fontSize="14px">{address}</Text>
                 )}
             </Flex>
         </td>
         <td>
-            {status === "active" && (
+          <Flex justifyContent="space-between" alignItems="center">
+            {status === 'active'
+              ? (
                 <Pill color="#018002" className={styles.pill}>
                     Active
                 </Pill>
-            )}
-            {status === "pendingAddition" && (
+              ) : status === 'pendingAddition'
+              ? (
                 <Pill color="#FFA505" className={styles.pill}>
                     Pending Addition
                 </Pill>
-            )}
-            {status === "pendingRemoval" && (
+              ) : status === 'pendingRemoval'
+              ? (
                 <Pill color="#FFA505" className={styles.pill}>
                     Pending Removal
                 </Pill>
-            )}
-            {status === "failAddition" && (
-                <Fragment>
+              ) : status === 'failAddition'
+              ? (
+                <Box>
                     <Pill color="#FF1C1E" className={styles.pill}>
                         Addition Failed
                     </Pill>
@@ -67,10 +55,10 @@ const AdminRow = ({
                     >
                         Clear
                     </Pill>
-                </Fragment>
-            )}
-            {status === "failRemoval" && (
-                <Fragment>
+                </Box>
+              ) : status === 'failRemoval'
+              ? (
+                <Box>
                     <Pill color="#FF1C1E" className={styles.pill}>
                         Removal Failed
                     </Pill>
@@ -82,8 +70,20 @@ const AdminRow = ({
                     >
                         Clear
                     </Pill>
-                </Fragment>
+                </Box>
+              ) : <div />
+            }
+            {!isSelf && isAdmin && (
+              <Button.Text
+                mainColor="#CCC"
+                disabled={status !== 'active'}
+                icon="Delete"
+                icononly
+                className={styles.removeIcon}
+                onClick={() => openRemoveModal(address)}
+              />
             )}
+          </Flex>
         </td>
     </tr>
 );
@@ -91,11 +91,10 @@ const AdminRow = ({
 AdminRow.propTypes = {
     address: PropTypes.string.isRequired,
     status: PropTypes.string.isRequired,
-    selected: PropTypes.bool.isRequired,
-    toggleRow: PropTypes.func.isRequired,
     isSelf: PropTypes.bool.isRequired,
     isAdmin: PropTypes.bool.isRequired,
-    deleteTransaction: PropTypes.func.isRequired
+    deleteTransaction: PropTypes.func.isRequired,
+    openRemoveModal: PropTypes.func.isRequired,
 };
 
 export default AdminRow;

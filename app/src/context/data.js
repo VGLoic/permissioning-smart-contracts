@@ -71,11 +71,18 @@ export const useData = () => {
         admins !== undefined &&
         whitelist !== undefined;
 
+    const isAdmin = dataReady ? admins.includes(userAddress) : false;
+
+    const formattedAdmins = admins
+      ? admins.map(address => ({ address, identifier: address, status: 'active' })).reverse()
+      : undefined;
+
     return {
         userAddress,
         dataReady,
+        isAdmin,
         isReadOnly,
-        admins,
+        admins: formattedAdmins,
         whitelist
     };
 };

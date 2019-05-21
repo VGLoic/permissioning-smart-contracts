@@ -6,11 +6,12 @@ import { Modal, Card, Button, Flex, Box, Heading, Text } from "rimble-ui";
 // Styles
 import styles from "./styles.module.scss";
 
-const RemoveAdminModal = ({
+const RemoveModal = ({
     closeModal,
     isOpen,
-    handleRemove,
-    numberToRemove
+    handleSubmit,
+    value,
+    display,
 }) => (
     <Modal isOpen={isOpen}>
         <Card width={"700px"} p={0}>
@@ -26,10 +27,9 @@ const RemoveAdminModal = ({
                 className={styles.closeIcon}
             />
             <Box p={4} mb={3}>
-                <Heading.h3>Remove Admin Account</Heading.h3>
+                <Heading.h3>{display.heading}</Heading.h3>
                 <Text>
-                    Are you sure you want to remove {numberToRemove} admin
-                    account?
+                    {display.subHeading}
                 </Text>
             </Box>
             <Flex
@@ -46,8 +46,7 @@ const RemoveAdminModal = ({
                 <Button
                     variant="danger"
                     ml={3}
-                    // mainColor="#000e1a"
-                    onClick={handleRemove}
+                    onClick={handleSubmit}
                 >
                     Remove
                 </Button>
@@ -56,11 +55,12 @@ const RemoveAdminModal = ({
     </Modal>
 );
 
-RemoveAdminModal.propTypes = {
+RemoveModal.propTypes = {
     closeModal: PropTypes.func.isRequired,
     isOpen: PropTypes.bool.isRequired,
-    handleRemove: PropTypes.func.isRequired,
-    numberToRemove: PropTypes.number.isRequired
+    handleSubmit: PropTypes.func.isRequired,
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]).isRequired,
+    display: PropTypes.object.isRequired,
 };
 
-export default RemoveAdminModal;
+export default RemoveModal;
