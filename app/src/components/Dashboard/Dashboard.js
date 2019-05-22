@@ -7,7 +7,7 @@ import LoadingPage from "../../components/LoadingPage/LoadingPage";
 // Constants
 import { ADMIN_TAB, ENODE_TAB } from "../../constants/tabs";
 import AdminTab from "../../containers/Tabs/Admin";
-// import WhitelistTable from "../../containers/WhitelistTable/WhitelistTable";
+import EnodeTab from "../../containers/Tabs/Enode";
 
 const Dashboard = ({ tab, setTab, dataReady }) => (
     <Fragment>
@@ -17,7 +17,7 @@ const Dashboard = ({ tab, setTab, dataReady }) => (
         ) : tab === ADMIN_TAB ? (
             <AdminTab />
         ) : tab === ENODE_TAB ? (
-            "ENODE"
+            <EnodeTab />
         ) : null}
     </Fragment>
 );

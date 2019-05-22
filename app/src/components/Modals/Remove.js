@@ -6,13 +6,7 @@ import { Modal, Card, Button, Flex, Box, Heading, Text } from "rimble-ui";
 // Styles
 import styles from "./styles.module.scss";
 
-const RemoveModal = ({
-    closeModal,
-    isOpen,
-    handleSubmit,
-    value,
-    display,
-}) => (
+const RemoveModal = ({ closeModal, isOpen, handleSubmit, value, display }) => (
     <Modal isOpen={isOpen}>
         <Card width={"700px"} p={0}>
             <Button.Text
@@ -28,9 +22,7 @@ const RemoveModal = ({
             />
             <Box p={4} mb={3}>
                 <Heading.h3>{display.heading}</Heading.h3>
-                <Text>
-                    {display.subHeading}
-                </Text>
+                <Text className={styles.break}>{display.subHeading}</Text>
             </Box>
             <Flex
                 px={4}
@@ -43,11 +35,7 @@ const RemoveModal = ({
                 <Button.Outline mainColor="black" onClick={closeModal}>
                     Cancel
                 </Button.Outline>
-                <Button
-                    variant="danger"
-                    ml={3}
-                    onClick={handleSubmit}
-                >
+                <Button variant="danger" ml={3} onClick={handleSubmit}>
                     Remove
                 </Button>
             </Flex>
@@ -60,7 +48,7 @@ RemoveModal.propTypes = {
     isOpen: PropTypes.bool.isRequired,
     handleSubmit: PropTypes.func.isRequired,
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]).isRequired,
-    display: PropTypes.object.isRequired,
+    display: PropTypes.object.isRequired
 };
 
 export default RemoveModal;

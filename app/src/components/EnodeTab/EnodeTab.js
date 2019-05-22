@@ -2,13 +2,13 @@
 import React, { Fragment } from "react";
 import PropTypes from "prop-types";
 // Components
-import EnodeTable from './Table';
+import EnodeTable from "./Table";
 import AddModal from "../../containers/Modals/Add";
 import RemoveModal from "../../containers/Modals/Remove";
-import LockModal from "../../containers/Modals/Lock";
+import LockModal from "../Modals/Lock";
 import Toasts from "../Toasts/Toasts";
 // Constants
-import { addEnodeDisplay, removeEnodeDisplay } from '../../constants/modals';
+import { addEnodeDisplay, removeEnodeDisplay } from "../../constants/modals";
 
 const EnodeTab = ({
     list,
@@ -24,15 +24,18 @@ const EnodeTab = ({
     isReadOnly,
     deleteTransaction,
     isValid,
+    pendingLock
 }) => (
     <Fragment>
         <Toasts toasts={toasts} closeToast={closeToast} />
         <EnodeTable
-          list={list}
-          userAddress={userAddress}
-          toggleModal={toggleModal}
-          isAdmin={isAdmin}
-          deleteTransaction={deleteTransaction}
+            list={list}
+            userAddress={userAddress}
+            toggleModal={toggleModal}
+            isAdmin={isAdmin}
+            deleteTransaction={deleteTransaction}
+            pendingLock={pendingLock}
+            isReadOnly={isReadOnly}
         />
         <AddModal
             isOpen={modals.add && isAdmin && !isReadOnly}
@@ -49,10 +52,10 @@ const EnodeTab = ({
             display={removeEnodeDisplay(modals.remove)}
         />
         <LockModal
-          isOpen={modals.lock && isAdmin}
-          closeModal={toggleModal("lock")}
-          handleLock={handleLock}
-          isReadOnly={isReadOnly}
+            isOpen={modals.lock && isAdmin}
+            closeModal={toggleModal("lock")}
+            handleLock={handleLock}
+            isReadOnly={isReadOnly}
         />
     </Fragment>
 );
@@ -71,6 +74,7 @@ EnodeTab.propTypes = {
     isReadOnly: PropTypes.bool.isRequired,
     deleteTransaction: PropTypes.func.isRequired,
     isValid: PropTypes.func.isRequired,
+    pendingLock: PropTypes.bool.isRequired
 };
 
 export default EnodeTab;

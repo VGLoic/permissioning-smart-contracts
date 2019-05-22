@@ -35,17 +35,19 @@ export const enodeToParams = enodeURL => {
     let ip = null;
     let port = null;
 
-    const splitURL = enodeURL.split("//")[1];
-    if (splitURL) {
-        const [enodeId, rawIpAndPort] = splitURL.split("@");
-        if (enodeId && enodeId.length === 128) {
-            enodeHigh = "0x" + enodeId.slice(0, 64);
-            enodeLow = "0x" + enodeId.slice(64);
-        }
-        if (rawIpAndPort) {
-            const [ipAndPort] = rawIpAndPort.split("?");
-            if (ipAndPort) {
-                [ip, port] = ipAndPort.split(":");
+    if (enodeURL) {
+        const splitURL = enodeURL.split("//")[1];
+        if (splitURL) {
+            const [enodeId, rawIpAndPort] = splitURL.split("@");
+            if (enodeId && enodeId.length === 128) {
+                enodeHigh = "0x" + enodeId.slice(0, 64);
+                enodeLow = "0x" + enodeId.slice(64);
+            }
+            if (rawIpAndPort) {
+                const [ipAndPort] = rawIpAndPort.split("?");
+                if (ipAndPort) {
+                    [ip, port] = ipAndPort.split(":");
+                }
             }
         }
     }
@@ -59,7 +61,6 @@ export const enodeToParams = enodeURL => {
 
 export const isValidEnode = str => {
     const params = enodeToParams(str);
-    console.log(params);
     const hasValues = !Object.values(params).some(value => !value);
     return hasValues;
 };
@@ -118,6 +119,14 @@ export const identifierToParams = identifier => {
         port,
         identifier
     };
+};
+
+export const identifierToEnodeHighAndLow = identifier => {
+    if (identifier) {
+        const [enodeHigh, enodeLow] = identifier.split("_");
+        return `${enodeHigh}${enodeLow}`;
+    }
+    return "";
 };
 
 export const paramsToIdentifier = ({ enodeHigh, enodeLow, ip, port }) => {
