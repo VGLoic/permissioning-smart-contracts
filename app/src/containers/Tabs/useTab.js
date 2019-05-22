@@ -101,6 +101,7 @@ export default (originalList, identifierToParams) => {
         timeout = 5000
     ) => {
         const timeoutId = setTimeout(closeToast(identifier), timeout);
+        closeToast(identifier)();
         setToasts(toasts => [
             ...toasts,
             { identifier, status, message, secondaryMessage }
@@ -115,7 +116,6 @@ export default (originalList, identifierToParams) => {
         secondaryMessage,
         timeout = 5000
     ) => {
-        const timeoutId = setTimeout(closeToast(targetedIdentifier), timeout);
         setToasts(toasts => {
             const updatedToasts = [...toasts];
             const index = updatedToasts.findIndex(
@@ -134,6 +134,7 @@ export default (originalList, identifierToParams) => {
                 }
             ];
         });
+        const timeoutId = setTimeout(closeToast(targetedIdentifier), timeout);
         setTimeouts(timeouts => [...timeouts, timeoutId]);
     };
 
